@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "FinalProject";
+$host = $_ENV['DB_HOST'];
+$user = $_ENV['DB_USER'];
+$pass = $_ENV['DB_PASS'];
+$db   = $_ENV['DB_NAME'];
 
 // Use Database class for connection while keeping $conn variable for backward compatibility
 require_once __DIR__ .  '/../app/Controllers/Database.php';
