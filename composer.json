@@ -1,0 +1,13 @@
+{
+    "name": "dimaz/finalproject",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Dimaz Wahyudy",
+            "email": "dimazwahyudyy@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^7.0"
+    }
+}
