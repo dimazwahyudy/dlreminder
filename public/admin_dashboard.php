@@ -19,6 +19,7 @@ $user = $_SESSION['user'];
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script> tailwind.config = { theme: { extend: { colors: { primary: '#9333ea', primaryHover: '#7e22ce' }, fontFamily: { sans: ['Inter'], heading: ['Poppins'] } } } } </script>
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
@@ -30,7 +31,7 @@ $user = $_SESSION['user'];
 <body class="bg-gray-50 font-sans text-gray-600">
 
     <nav class="bg-white border-b sticky top-0 z-40 px-8 h-20 flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2" onclick="window.location.href='index.php'">
             <div class="bg-primary text-white p-1.5 rounded-lg"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></div>
             <span class="font-heading font-bold text-xl text-gray-800">DLR<span class="text-primary">Admin</span></span>
         </div>
@@ -43,17 +44,26 @@ $user = $_SESSION['user'];
     
     <div class="relative">
         <button onclick="toggleProfileMenu()" class="flex items-center gap-3 focus:outline-none hover:bg-gray-50 p-2 rounded-xl transition">
-            <span class="font-heading font-bold text-sm text-gray-800"><?php echo htmlspecialchars($user['name']); ?></span>
-            <div class="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold shadow-sm">A</div>
+            <div class="text-right hidden sm:block">
+                <div class="font-heading font-bold text-sm text-gray-800" id="navUserName"><?php echo htmlspecialchars($user['name']); ?></div>
+                <div class="text-xs text-primary font-bold uppercase"><?php echo htmlspecialchars($user['role']); ?></div>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-purple-300 flex items-center justify-center text-primary font-bold border border-purple-200 shadow-sm">
+                <?php echo strtoupper(substr($user['name'], 0, 2)); ?>
+            </div>
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </button>
 
-        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-            <a href="#" onclick="openProfileModal()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-primary">Edit Profil</a>
-            <a href="logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</a>
+        <div id="profileMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
+            <div class="px-4 py-3 border-b border-gray-50 bg-gray-50">
+                <p class="text-xs text-gray-500">Login sebagai</p>
+                <p class="text-sm font-bold text-gray-800 truncate"><?php echo htmlspecialchars($user['name']); ?></p>
+            </div>
+            <a href="#" onclick="openProfileModal()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-primary transition">Edit Profil</a>
+            <a href="logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Logout</a>
         </div>
     </div>
-</div>
+    </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-8 py-8">
@@ -65,11 +75,33 @@ $user = $_SESSION['user'];
             </div>
         </div>
 
+        <!-- Semester Analytics (same as user dashboard) -->
+        <div class="w-full bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-heading text-lg font-bold">Analitik: Beban Kerja Semester</h3>
+                <div class="flex items-center gap-2">
+                    <select id="adminAnalyticsYear" class="border px-2 py-1 rounded text-sm"></select>
+                    <select id="adminAnalyticsSem" class="border px-2 py-1 rounded text-sm"><option value="1">Semester 1 (Jan–Jun)</option><option value="2">Semester 2 (Jul–Dec)</option></select>
+                    <button id="adminDownloadCsv" class="text-sm bg-gray-100 px-3 py-1 rounded border">Unduh CSV</button>
+                </div>
+            </div>
+            <div id="adminAnalyticsCards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                    <canvas id="adminBarChart" class="w-full h-44"></canvas>
+                </div>
+                <div>
+                    <canvas id="adminPieChart" class="w-full h-44"></canvas>
+                </div>
+            </div>
+            <div id="adminAnalyticsNotes" class="mt-3 text-sm text-gray-600"></div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <div id="calendar"></div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-h-[70vh] overflow-auto">
                 <h3 class="font-heading text-lg font-bold mb-4">Tugas Admin</h3>
                 <div id="adminTaskList" class="space-y-3 text-sm text-gray-500">Memuat...</div>
             </div>
@@ -543,7 +575,129 @@ $user = $_SESSION['user'];
 
             // Preload classes for selects and list
             loadClassList();
+
+            // --- Admin: semester analytics UI logic (reuse lightweight logic) ---
+            const adminAnalyticsYear = document.getElementById('adminAnalyticsYear');
+            const adminAnalyticsSem = document.getElementById('adminAnalyticsSem');
+            const adminAnalyticsCards = document.getElementById('adminAnalyticsCards');
+            const adminAnalyticsNotes = document.getElementById('adminAnalyticsNotes');
+            const adminDownloadCsv = document.getElementById('adminDownloadCsv');
+
+            function adminPopulateYearSelect() {
+                const cur = new Date().getFullYear();
+                for (let y = cur; y >= cur-5; y--) {
+                    const opt = document.createElement('option'); opt.value = y; opt.textContent = y; adminAnalyticsYear.appendChild(opt);
+                }
+                adminAnalyticsYear.value = new Date().getFullYear();
+                adminAnalyticsSem.value = (new Date().getMonth() < 6) ? '1' : '2';
+            }
+
+            async function adminFetchSemesterAnalytics(year, sem) {
+                try {
+                    const res = await fetch(`analytics_api.php?range=semester&year=${year}&sem=${sem}`);
+                    const data = await res.json();
+                    if (!data.status) throw new Error(data.message || 'Error');
+                    return data;
+                } catch (e) { console.error('adminFetchSemesterAnalytics', e); return null; }
+            }
+
+            function adminRenderAnalytics(data) {
+                if (!data) return;
+                adminAnalyticsCards.innerHTML = '';
+                const cards = [
+                    {k:'total_events',t:'Total Event',fmt:v=>v},
+                    {k:'weeks',t:'Jumlah Minggu',fmt:v=>v},
+                    {k:'avg_per_week',t:'Rata-rata / Minggu',fmt:v=>v},
+                    {k:'avg_duration_hours',t:'Rata-rata Durasi (jam)',fmt:v=>v}
+                ];
+                cards.forEach(c=>{
+                    const v = data[c.k] ?? 0;
+                    const el = document.createElement('div'); el.className='p-3 bg-gray-50 rounded-lg border border-gray-100';
+                    el.innerHTML = `<div class="text-xs text-gray-500">${c.t}</div><div class="font-bold text-lg">${c.fmt(v)}</div>`;
+                    adminAnalyticsCards.appendChild(el);
+                });
+                adminAnalyticsNotes.innerHTML = `<div>Periode: <strong>${data.period.start}</strong> — <strong>${data.period.end}</strong></div><div class="mt-2">Event puncak: Bulan <strong>${data.busiest_month || '-'}</strong> (${data.busiest_month_count} events), Hari paling sibuk: <strong>${data.busiest_weekday || '-'}</strong> (${data.busiest_weekday_count})</div>`;
+                // render charts (bar: month_series, pie: weekday_series)
+                try {
+                    const barCtx = document.getElementById('adminBarChart').getContext('2d');
+                    if (window._adminBarChart) window._adminBarChart.destroy();
+                    window._adminBarChart = new Chart(barCtx, {
+                        type: 'bar', data: { labels: data.month_series.labels, datasets: [{ label: 'Events', data: data.month_series.data, backgroundColor: 'rgba(147,51,234,0.7)' }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                    });
+                } catch (e) { console.warn('bar chart error', e); }
+
+                try {
+                    const pieCtx = document.getElementById('adminPieChart').getContext('2d');
+                    if (window._adminPieChart) window._adminPieChart.destroy();
+                    window._adminPieChart = new Chart(pieCtx, {
+                        type: 'pie', data: { labels: data.weekday_series.labels, datasets: [{ data: data.weekday_series.data, backgroundColor: ['#9333ea','#7c3aed','#4f46e5','#2563eb','#06b6d4','#10b981','#f59e0b'] }] },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                } catch (e) { console.warn('pie chart error', e); }
+            }
+
+            adminDownloadCsv.addEventListener('click', () => {
+                const y = adminAnalyticsYear.value; const s = adminAnalyticsSem.value;
+                window.location = `analytics_api.php?range=semester&year=${y}&sem=${s}&export=csv`;
+            });
+
+            adminPopulateYearSelect();
+            (async ()=>{ const d = await adminFetchSemesterAnalytics(adminAnalyticsYear.value, adminAnalyticsSem.value); adminRenderAnalytics(d); })();
+            adminAnalyticsYear.addEventListener('change', async ()=>{ const d = await adminFetchSemesterAnalytics(adminAnalyticsYear.value, adminAnalyticsSem.value); adminRenderAnalytics(d); });
+            adminAnalyticsSem.addEventListener('change', async ()=>{ const d = await adminFetchSemesterAnalytics(adminAnalyticsYear.value, adminAnalyticsSem.value); adminRenderAnalytics(d); });
         });
+
+        // --- PROFILE LOGIC (copied from user dashboard) ---
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profileMenu');
+            if (!menu) return;
+            menu.classList.toggle('hidden');
+        }
+
+        // Tutup menu jika klik di luar
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('profileMenu');
+            const btn = document.querySelector('button[onclick="toggleProfileMenu()"]');
+            if (!menu || !btn) return;
+            if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        async function openProfileModal() {
+            const pm = document.getElementById('profileMenu'); if (pm) pm.classList.add('hidden'); // Tutup menu
+            try {
+                const res = await fetch('profile_api.php');
+                const data = await res.json();
+                // lazy: populate minimal fields if modal exists
+                if (document.getElementById('profName')) document.getElementById('profName').value = data.name || '';
+                if (document.getElementById('profEmail')) document.getElementById('profEmail').value = data.email || '';
+
+                // if there is a profile modal that expects dosen classes, populate similarly (best-effort)
+                if (data.is_dosen) {
+                    const container = document.getElementById('dosenClasses');
+                    const list = document.getElementById('dosenClassesList');
+                    if (container && list) {
+                        container.classList.remove('hidden');
+                        list.innerHTML = '';
+                        (data.classes || []).forEach(c => {
+                            const id = c.id;
+                            const checked = (data.selected_classes || []).includes(id) ? 'checked' : '';
+                            const el = document.createElement('div');
+                            el.innerHTML = `<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="class_cb" value="${id}" ${checked}> <span>${c.nama_kelas} (${c.kode_kelas})</span></label>`;
+                            list.appendChild(el);
+                        });
+                    }
+                }
+
+                const modal = document.getElementById('profileModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            } catch(e) { console.warn('openProfileModal error', e); alert('Gagal memuat profil'); }
+        }
     </script>
 </body>
 </html>

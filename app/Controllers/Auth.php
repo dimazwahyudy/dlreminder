@@ -19,6 +19,7 @@ class Auth {
         $email = $_POST['email'];
         $nim   = $_POST['nim'];
         $kelas = $_POST['kelas'];
+        $prodi = $_POST['prodi'];
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
         $this->conn->begin_transaction();
@@ -40,7 +41,6 @@ class Auth {
             $stmt = $this->conn->prepare(
                 "INSERT INTO mahasiswa (user_id,nim,prodi,kelas_id) VALUES (?,?,?,?)"
             );
-            $prodi = "Informatika";
             $stmt->bind_param("issi",$user_id,$nim,$prodi,$kelas_id);
             $stmt->execute();
 
@@ -95,14 +95,12 @@ class Auth {
         $check->execute();
         $hasToken = $check->get_result()->num_rows > 0;
 
-        // If user already has Google tokens, try to sync pending mappings and import their Google events now.
+        // kalau user sudah punya token, lakukan pending import dan tarik data dari google.
         if ($hasToken) {
             require_once __DIR__ . '/EventAPI.php';
             $eventApi = new EventAPI($this->conn, $_SESSION['user']);
-            // attempt to process pending mappings first
             try { $eventApi->syncPendingForUser($user['id']); } catch (
                 Exception $e) { /* ignore sync errors on login */ }
-            // then import user's Google events (if access present)
             try { $eventApi->importGoogleForUser($user['id']); } catch (\Exception $e) { /* ignore import errors */ }
             header("Location: dashboard.php");
         } else {

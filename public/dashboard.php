@@ -7,6 +7,12 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 $user = $_SESSION['user'];
+
+if ($user['role']==='admin'){
+    header('Location: admin_dashboard.php');
+    exit;
+}
+
 // detect whether this user already has a valid google_token so we can hide the link
 $has_google = false;
 $check_table = $conn->query("SHOW TABLES LIKE 'google_token'");
@@ -115,7 +121,7 @@ if ($check_table && $check_table->num_rows > 0) {
         <!-- Analitik: Beban Kerja (line) + Event per Hari (pie) -->
         <div class="w-full bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mt-4">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="font-heading text-xl font-bold text-gray-800">Analitik Beban Kerja</h3>
+                <h3 class="font-heading text-xl font-bold text-gray-800">Analitik WorkLoad</h3>
                 <div class="flex items-center gap-2 text-sm">
                     <button id="btnYear2025" class="px-3 py-1 rounded-full bg-purple-50 text-purple-600">2025</button>
                     <button id="btnYear2024" class="px-3 py-1 rounded-full bg-white text-gray-500 border">2024</button>
@@ -129,6 +135,29 @@ if ($check_table && $check_table->num_rows > 0) {
                     <h4 class="font-bold mb-2">Event per Hari (Kategori)</h4>
                     <div class="chart-box"><canvas id="weekdayPieChart"></canvas></div>
                     <p class="text-xs text-gray-500 mt-3">Kategori: Hari (Senin–Minggu). Hanya data yang dapat Anda lihat.</p>
+                </div>
+            </div>
+            
+            <!-- Semester Analytics: Workload summary cards + CSV -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                <div class="md:col-span-2 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold">Analitik: WorkLoad Semester</h4>
+                        <div class="flex items-center gap-2">
+                            <select id="analyticsYear" class="border px-2 py-1 rounded text-sm"></select>
+                            <select id="analyticsSem" class="border px-2 py-1 rounded text-sm">
+                                <option value="1">Semester 1 (Jan–Jun)</option>
+                                <option value="2">Semester 2 (Jul–Dec)</option>
+                            </select>
+                            <button id="downloadCsv" class="text-sm bg-gray-100 px-3 py-1 rounded border">Unduh CSV</button>
+                        </div>
+                    </div>
+                    <div id="analyticsCards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                    <div id="analyticsNotes" class="mt-3 text-sm text-gray-600"></div>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <h4 class="font-bold mb-2">Rekomendasi</h4>
+                    <div id="analyticsRecommendations" class="text-sm text-gray-700"></div>
                 </div>
             </div>
         </div>
@@ -151,8 +180,11 @@ if ($check_table && $check_table->num_rows > 0) {
                     <div><label class="block text-sm font-medium text-gray-700 mb-1">Judul Event</label><input name="title" class="w-full border px-4 py-2 rounded-lg" required /></div>
                     <div><label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label><textarea name="description" class="w-full border px-4 py-2 rounded-lg"></textarea></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Deadline (Tanggal)</label><input name="end" type="date" class="w-full border px-3 py-2 rounded-lg" required /></div>
-                        <div class="flex items-center gap-2"><label class="flex items-center gap-2"><input type="checkbox" name="repeat_monthly"> <span class="text-sm text-gray-700">Ulangi setiap bulan (12x)</span></label></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Mulai (Tanggal & Jam)</label><input name="start" type="datetime-local" class="w-full border px-3 py-2 rounded-lg" required /></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Selesai (Tanggal & Jam)</label><input name="end" type="datetime-local" class="w-full border px-3 py-2 rounded-lg" required /></div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="flex items-center gap-2"><input type="checkbox" name="repeat_monthly"> <span class="text-sm text-gray-700">Ulangi setiap bulan (12x)</span></label>
                     </div>
                     <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
                         <label class="block text-xs font-bold text-gray-500 mb-2 uppercase">Target Audiens</label>
@@ -181,6 +213,16 @@ if ($check_table && $check_table->num_rows > 0) {
                     <div>
                         <label class="text-xs font-bold text-gray-500">Deskripsi</label>
                         <textarea name="description" id="editEventDesc" class="w-full border px-3 py-2 rounded-lg h-24"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-gray-500">Mulai</label>
+                            <input name="start" id="editStart" type="datetime-local" class="w-full border px-3 py-2 rounded-lg" required />
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-gray-500">Selesai</label>
+                            <input name="end" id="editEnd" type="datetime-local" class="w-full border px-3 py-2 rounded-lg" required />
+                        </div>
                     </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
@@ -394,11 +436,92 @@ if ($check_table && $check_table->num_rows > 0) {
                 window.scrollTo(0, y);
             }
 
+            // --- Semester analytics UI logic ---
+            const analyticsYear = document.getElementById('analyticsYear');
+            const analyticsSem = document.getElementById('analyticsSem');
+            const analyticsCards = document.getElementById('analyticsCards');
+            const analyticsNotes = document.getElementById('analyticsNotes');
+            const analyticsRecommendations = document.getElementById('analyticsRecommendations');
+            const downloadCsv = document.getElementById('downloadCsv');
+
+            function populateYearSelect() {
+                const cur = new Date().getFullYear();
+                for (let y = cur; y >= cur-5; y--) {
+                    const opt = document.createElement('option'); opt.value = y; opt.textContent = y; analyticsYear.appendChild(opt);
+                }
+                analyticsYear.value = new Date().getFullYear();
+                analyticsSem.value = (new Date().getMonth() < 6) ? '1' : '2';
+            }
+
+            async function fetchSemesterAnalytics(year, sem) {
+                try {
+                    const res = await fetch(`analytics_api.php?range=semester&year=${year}&sem=${sem}`);
+                    const data = await res.json();
+                    if (!data.status) throw new Error(data.message || 'Error');
+                    return data;
+                } catch (e) { console.error('fetchSemesterAnalytics', e); return null; }
+            }
+
+            function renderAnalytics(data) {
+                if (!data) return;
+                analyticsCards.innerHTML = '';
+                const cards = [
+                    {k:'total_events',t:'Total Event',fmt:v=>v},
+                    {k:'weeks',t:'Jumlah Minggu',fmt:v=>v},
+                    {k:'avg_per_week',t:'Rata-rata / Minggu',fmt:v=>v},
+                    {k:'avg_duration_hours',t:'Rata-rata Durasi (jam)',fmt:v=>v}
+                ];
+                cards.forEach(c=>{
+                    const v = data[c.k] ?? 0;
+                    const el = document.createElement('div'); el.className='p-3 bg-gray-50 rounded-lg border border-gray-100';
+                    el.innerHTML = `<div class="text-xs text-gray-500">${c.t}</div><div class="font-bold text-lg">${c.fmt(v)}</div>`;
+                    analyticsCards.appendChild(el);
+                });
+                analyticsNotes.innerHTML = `<div>Periode: <strong>${data.period.start}</strong> — <strong>${data.period.end}</strong></div><div class="mt-2">Event puncak: Bulan <strong>${data.busiest_month || '-'}</strong> (${data.busiest_month_count} events), Hari paling sibuk: <strong>${data.busiest_weekday || '-'}</strong> (${data.busiest_weekday_count})</div>`;
+                analyticsRecommendations.innerHTML = data.recommendations.map(r=>`<div class="mb-2">• ${r}</div>`).join('');
+            }
+
+            downloadCsv.addEventListener('click', () => {
+                const y = analyticsYear.value; const s = analyticsSem.value;
+                window.location = `analytics_api.php?range=semester&year=${y}&sem=${s}&export=csv`;
+            });
+
+            populateYearSelect();
+            // initial load
+            (async ()=>{
+                const y = analyticsYear.value; const s = analyticsSem.value;
+                const data = await fetchSemesterAnalytics(y,s);
+                renderAnalytics(data);
+            })();
+
+            analyticsYear.addEventListener('change', async ()=>{ const d = await fetchSemesterAnalytics(analyticsYear.value, analyticsSem.value); renderAnalytics(d); });
+            analyticsSem.addEventListener('change', async ()=>{ const d = await fetchSemesterAnalytics(analyticsYear.value, analyticsSem.value); renderAnalytics(d); });
+
+            // Helper: format Date -> value suitable for <input type="datetime-local">
+            function formatForDatetimeLocal(d) {
+                if (!d) return '';
+                const z = (x) => x.toString().padStart(2, '0');
+                const year = d.getFullYear();
+                const month = z(d.getMonth()+1);
+                const day = z(d.getDate());
+                const hour = z(d.getHours());
+                const min = z(d.getMinutes());
+                return `${year}-${month}-${day}T${hour}:${min}`;
+            }
+
             window.openCreateModal = function(dateStr) {
                 eventForm.reset();
                 const baseDate = dateStr ? dateStr : new Date().toISOString().slice(0,10);
-                // deadline date input expects YYYY-MM-DD
-                eventForm.end.value = baseDate;
+                // If dateStr contains only date (YYYY-MM-DD), set start at 00:00 and end at 23:59
+                let startVal = baseDate;
+                let endVal = baseDate;
+                if (baseDate.length === 10) {
+                    startVal = baseDate + 'T00:00';
+                    endVal = baseDate + 'T23:59';
+                }
+                // populate datetime-local inputs
+                if (eventForm.start) eventForm.start.value = startVal;
+                if (eventForm.end) eventForm.end.value = endVal;
                 visibilityOptions.innerHTML = '';
                 if (CURRENT_USER.role === 'dosen') {
                     visibilityOptions.innerHTML = `<div class="flex gap-4"><label class="flex items-center gap-2"><input type="checkbox" name="opt_dosen" checked> Dosen</label><label class="flex items-center gap-2"><input type="checkbox" name="opt_mahasiswa"> Mahasiswa</label></div>`;
@@ -453,7 +576,10 @@ if ($check_table && $check_table->num_rows > 0) {
                 const props = event.extendedProps;
                 document.getElementById('detailTitle').textContent = event.title;
                 document.getElementById('detailCreator').textContent = 'Oleh: ' + (props.creator_name || 'System');
-                document.getElementById('detailTime').textContent = new Date(event.start).toLocaleString('id-ID');
+                // Show full start - end range
+                const startStr = event.start ? new Date(event.start).toLocaleString('id-ID') : '';
+                const endStr = event.end ? new Date(event.end).toLocaleString('id-ID') : '';
+                document.getElementById('detailTime').textContent = startStr + (endStr ? ('  —  ' + endStr) : '');
                 document.getElementById('detailDesc').textContent = props.description || "-";
                 
                 const badge = document.getElementById('detailBadge');
@@ -469,7 +595,7 @@ if ($check_table && $check_table->num_rows > 0) {
                     document.getElementById('btnEditEvent').onclick = () => {
                         document.getElementById('eventDetailModal').classList.add('hidden');
                         document.getElementById('eventDetailModal').classList.remove('flex');
-                        openEditModal(event.id, event.title, props.description);
+                        openEditModal(event);
                     };
                 } else {
                     actionsDiv.classList.add('hidden');
@@ -478,10 +604,16 @@ if ($check_table && $check_table->num_rows > 0) {
                 document.getElementById('eventDetailModal').classList.add('flex');
             }
 
-            function openEditModal(id, title, desc) {
-                document.getElementById('editEventId').value = id;
-                document.getElementById('editEventTitle').value = title;
-                document.getElementById('editEventDesc').value = desc || '';
+            function openEditModal(ev) {
+                // ev is a FullCalendar Event object
+                document.getElementById('editEventId').value = ev.id;
+                document.getElementById('editEventTitle').value = ev.title || '';
+                document.getElementById('editEventDesc').value = ev.extendedProps?.description || '';
+                // populate datetime-local fields
+                try {
+                    if (ev.start) document.getElementById('editStart').value = formatForDatetimeLocal(new Date(ev.start));
+                    if (ev.end) document.getElementById('editEnd').value = formatForDatetimeLocal(new Date(ev.end));
+                } catch(e) {}
                 document.getElementById('editEventModal').classList.remove('hidden');
                 document.getElementById('editEventModal').classList.add('flex');
             }

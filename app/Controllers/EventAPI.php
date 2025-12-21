@@ -523,16 +523,30 @@ class EventAPI {
             // CREATE
             $title = trim($_POST['title'] ?? '');
             $description = trim($_POST['description'] ?? '');
+            $start_input = $_POST['start'] ?? null;
             $end_input = $_POST['end'] ?? null;
 
-            if (!$title || !$end_input) { http_response_code(422); echo json_encode(["status" => false, "message" => "Data wajib diisi (judul & deadline)"]); exit; }
+            if (!$title || !$start_input || !$end_input) { http_response_code(422); echo json_encode(["status" => false, "message" => "Data wajib diisi (judul, mulai & selesai)"]); exit; }
 
+            // Parse start
+            if (strpos($start_input, 'T') !== false || strpos($start_input, ' ') !== false) {
+                $start_dt = date('Y-m-d H:i:s', strtotime($start_input));
+            } else {
+                $start_dt = date('Y-m-d', strtotime($start_input)) . ' 00:00:00';
+            }
+
+            // Parse end
             if (strpos($end_input, 'T') !== false || strpos($end_input, ' ') !== false) {
                 $end_dt = date('Y-m-d H:i:s', strtotime($end_input));
             } else {
                 $end_dt = date('Y-m-d', strtotime($end_input)) . ' 23:59:59';
             }
-            $start_dt = date('Y-m-d', strtotime($end_dt)) . ' 00:00:00';
+
+            // Ensure end is not earlier than start
+            if (strtotime($end_dt) < strtotime($start_dt)) {
+                // adjust end to be start + 1 hour
+                $end_dt = date('Y-m-d H:i:s', strtotime('+1 hour', strtotime($start_dt)));
+            }
 
             $visibility = 'self';
             if ($role === 'dosen') {

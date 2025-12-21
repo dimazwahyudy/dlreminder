@@ -89,45 +89,6 @@
                     Pelajari Fitur
                 </a>
             </div>
-            
-            <div class="mt-20 relative mx-auto w-full max-w-5xl animate-float">
-                <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent z-10 h-32 bottom-0"></div>
-                <div class="bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-purple-200 p-2 overflow-hidden ring-1 ring-gray-100">
-                    <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-                         <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-white">
-                            <div class="flex gap-1.5">
-                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-green-400"></div>
-                            </div>
-                            <div class="ml-4 bg-gray-100 rounded-md px-3 py-1 text-xs text-gray-400 font-mono flex-1 text-center">localhost:8000/dl-reminder</div>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 text-left">
-                            <div class="hidden md:block col-span-2 space-y-3">
-                                <div class="h-8 bg-purple-100 rounded-lg w-full"></div>
-                                <div class="h-8 bg-white border border-gray-100 rounded-lg w-3/4"></div>
-                            </div>
-                            <div class="col-span-12 md:col-span-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm col-span-2">
-                                    <div class="h-4 bg-gray-100 rounded w-1/3 mb-4"></div>
-                                    <div class="h-32 bg-purple-50 rounded-lg flex items-center justify-center text-purple-300">
-                                        <div class="text-center">
-                                            <div class="text-2xl font-heading font-bold mb-1">Workload Chart</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                                    <div class="h-4 bg-gray-100 rounded w-1/2 mb-4"></div>
-                                    <div class="space-y-2">
-                                        <div class="h-10 bg-red-50 border-l-4 border-red-400 rounded p-2 text-xs text-red-400 font-heading">Tugas PHP</div>
-                                        <div class="h-10 bg-yellow-50 border-l-4 border-yellow-400 rounded p-2 text-xs text-yellow-600 font-heading">Kuis SQL</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -197,11 +158,15 @@
                     <ul class="space-y-3 text-sm text-gray-500">
                         <li class="flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            ini pasangin email
+                            if24.septianputra@mhs.ubpkarawang.ac.id
                         </li>
                         <li class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                            aaaa
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            if24.nurmukhlisin@mhs.ubpkarawang.ac.id
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            if24.dimazwahyudy@mhs.ubpkarawang.ac.id
                         </li>
                     </ul>
                 </div>

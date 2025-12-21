@@ -56,7 +56,7 @@ if (isset($_SESSION['error'])) {
                     <select id="classSelect" name="kelas" class="bg-gray-50 border-none px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-primary focus:outline-none transition text-xs font-medium text-gray-400 cursor-pointer" required>
                         <option value="" disabled selected>Pilih Kelas</option>
                     </select>
-
+                    <input type="text" name="prodi" placeholder="Prodi" class="bg-gray-50 border-none px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-primary focus:outline-none transition text-xs font-medium" />
                     <input type="email" name="email" placeholder="Email Kampus" class="bg-gray-50 border-none px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-primary focus:outline-none transition text-xs font-medium" />
                     <input type="password" name="password" placeholder="Password" class="bg-gray-50 border-none px-4 py-2.5 w-full rounded-lg focus:ring-2 focus:ring-primary focus:outline-none transition text-xs font-medium" />
                 </div>
