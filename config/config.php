@@ -3,8 +3,8 @@ $tz = 'Asia/Jakarta';
 if (function_exists('date_default_timezone_set')) date_default_timezone_set($tz);
 
 $host = "localhost";
-$user = "root";
-$pass = "";
+$user = "dlreminderfp";
+$pass = "finalproject321";
 $db   = "FinalProject";
 
 // Use Database class for connection while keeping $conn variable for backward compatibility
