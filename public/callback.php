@@ -71,6 +71,11 @@ $stmt->execute();
 require_once __DIR__ .  '/../app/Controllers/EventAPI.php';
 $eventApi = new EventAPI($conn, $_SESSION['user']);
 $syncRes = $eventApi->syncPendingForUser($user_id);
+// Also import user's Google Calendar items immediately after connecting
+try {
+    $importRes = $eventApi->importGoogleForUser($user_id);
+} catch (Exception $e) {
+}
 
 header("Location: dashboard.php?google=connected");
 exit;
