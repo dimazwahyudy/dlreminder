@@ -223,10 +223,10 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `email`, `password`) VALUES
-(10, 'Super Admin', 'dlreminderfp@gmail.com', '$2y$10$9D.EXNfSdj7foQoSUky.DeD2Njw8onX2UvSTjWDALIn33gPsBSi/e'),
-(11, 'Dosen', 'if24.dimazwahyudy@mhs.ubpkarawang.ac.id', '$2y$10$JGIC9sPNRSDcJhdWCopxZeentyeHcL0on9ToPD6mPyzyTFyfYNbeO'),
-(12, 'Mahasiswa1', 'if24.septianputra@mhs.ubpkarawang.ac.id', '$2y$10$ryMENmmWmGRMHwXicFLqFeacZq2aX9K5CcX7MZHmsvaXn.SYBoVJa'),
-(13, 'Mahasiswa2', 'if24.nurmukhlisin@mhs.ubpkarawang.ac.id', '$2y$10$4bGlAOkNaGKOjmny6pRjXeMfuN7caaKxN0O9Isu.kScY87DiT3Wf2');
+(10, 'Super Admin', 'dlreminderfp@gmail.com', '$2y$10$Yd3wIwADGVdg.coyvpRmcOkDvinomMsVp.uxlurT2wOvb2K1SO9uK'),
+(11, 'Dosen', 'if24.dimazwahyudy@mhs.ubpkarawang.ac.id', '$2y$10$QI0Hm8xb83qZGg/P1mwno.5RqA5MHBvONcXxFZymqqRk7Rv6vh282'),
+(12, 'Mahasiswa1', 'if24.septianputra@mhs.ubpkarawang.ac.id', '$2y$10$a3SECXakygiXTeDq1tkuzuPXYmeMpOirUZwJVUgFNQsCViwWLvRta'),
+(13, 'Mahasiswa2', 'if24.nurmukhlisin@mhs.ubpkarawang.ac.id', '$2y$05$5XwkXFG0B81o9rKVdC/jWuJb8rfe7sjCYV5J4iGggFrF9GyoWKouK');
 
 --
 -- Indexes for dumped tables

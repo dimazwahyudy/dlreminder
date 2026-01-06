@@ -40,29 +40,33 @@ Konfigurasi sistem disimpan dalam file environment. Buat file baru bernama .env 
 
 # DATABASE
 DB_HOST=localhost
-DB_DATABASE=finalproject
+DB_DATABASE=FinalProject
 DB_USERNAME=root
 DB_PASSWORD=
 
-# GOOGLE API (Fitur Sync)
-GOOGLE_CLIENT_ID=isi_client_id_anda
-GOOGLE_CLIENT_SECRET=isi_client_secret_anda
-GOOGLE_REDIRECT_URI=http://localhost/dlreminder/google_callback.php
-
 # EMAIL (Fitur Notifikasi & OTP)
 SMTP_HOST=smtp.gmail.com
-SMTP_EMAIL=email_anda@gmail.com
-SMTP_PASSWORD=app_password_anda
+SMTP_EMAIL=dlreminderfp@gmail.com
+SMTP_PASSWORD=fshj mvvk vqnb mwwi
 
-(Pastikan SMTP_PASSWORD menggunakan App Password 16 digit dari Google Account).
 
 ## 4. Daftar Akun Uji
-##Dosen
+##Super Admin
 - dlreminderfp@gmail.com
-- 
+- Admin112233
+##Dosen
+- if24.dimazwahyudy@mhs.ubpkarawang.ac.id
+- Dosen112233
+##Mahasiswa
+- if24.septianputra@mhs.ubpkarawang.ac.id
+- Mahasiswa1
+- if24.nurmukhlisin@mhs.ubpkarawang.ac.id
+- Mahasiswa2
+
 
 ## Author
 
 - Dimaz Wahyudy
 - Septian Eka Putra
+- Nur Mukhlisin
 Universitas Buana Perjuangan Karawang - 2025
